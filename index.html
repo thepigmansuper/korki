@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Wzory</title>
+        <style>
+            input[type="radio"]{
+                margin: 10px 5px;
+            }
+        </style>
+        <script type="text/javascript">
+            var formulas = [
+                ["C'", "0"],
+                ["x^n'", "nx^(n-1)"],
+                ["(ax+b)'", "a"],
+                ["x'", "1"],
+                ["a/x'", "-a/x^2"],
+                ["√x'", "1/(2√x)"],
+                ["a^x'", "a^x lna"],
+                ["e^x'", "e^x"],
+                ["log_a(x)'", "1/(x lna)"],
+                ["lnx'", "1/x"],
+                ["sinx'", "cosx"],
+                ["cosx'", "-sinx"],
+                ["tgx'", "1/cos^2(x)"],
+                ["ctgx'", "-1/sin^2(x)"],
+                ["arcsinx'", "1/√(1-x^2)"],
+                ["arccosx'", "-1/√(1-x^2)"],
+                ["arctgx'", "1/(x^2+1)"],
+                ["arcctgx'", "-1/(x^2+1)"],
+                ["∫dx'", "x"],
+                ["∫x^n dx'", "1/(n+1) x^(n+1)"],
+                ["∫x dx'", "1/2 x^2"],
+                ["∫1/x dx'", "ln|x|"],
+                ["∫1/x dx'", "ln|x|"],
+                ["∫1/x dx'", "ln|x|"],
+                ["∫a^x dx'", "a^x/lna"],
+                ["∫e^x dx'", "e^x"],
+                ["∫sinx dx'", "-cosx"],
+                ["∫cosx dx'", "sinx"],
+                ["∫tgx dx'", "-ln|cosx|"],
+                ["∫ctgx dx'", "ln|sinx|"],
+                ["∫1/cos^2(x) dx'", "tgx"],
+                ["∫1/sin^2(x) dx'", "-ctgx"],
+                ["∫1/(x^2+a^2) dx'", "1/a arctg(x/a)"],
+                ["∫1/(x^2-a^2) dx'", "1/(2a) ln| (x-a)/(x+a) |"],
+                ["∫1/√(a^2-x^2) dx'", "arcsin(x/a)"],
+                ["∫1/√(x^2+q) dx'", "ln|x+√(x^2+q)|"],
+                ["∫e^(ax+b) dx'", "1/a e^(ax+b)"],
+                ["∫e^(ax) dx'", "1/a e^(ax)"],
+                ["∫sin^(ax+b) dx'", "1/a -cos^(ax+b)"],
+                ["∫cos^(ax+b) dx'", "1/a sin^(ax+b)"],
+            ]
+
+            function shuffle(array) {
+                let currentIndex = array.length,  randomIndex;
+
+                // While there remain elements to shuffle.
+                while (currentIndex != 0) {
+
+                    // Pick a remaining element.
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+
+                    // And swap it with the current element.
+                    [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]];
+                }
+
+                return array;
+            }
+
+            const loadNew = () => {
+                var n = Math.floor(Math.random() * 100); // 0-99
+                var question = document.getElementById('question');
+                var formula = Math.floor(Math.random() * formulas.length);
+                if(n < parseInt(document.getElementById('probability').value)){
+                    var values = [formulas[formula][1]];
+                    for(var i=0; i<3; i++){
+                        var j = "";
+                        while(true){
+                            j = formulas[Math.floor(Math.random() * formulas.length)][1];
+                            if(!values.includes(j)){
+                                break;
+                            }
+                            
+                        }
+
+                        values.push(j);
+                    }
+                    values = shuffle(values);
+                    question.innerHTML = `
+                        <p>Wybierz poprawną odpowiedź</p>
+                        <p>Wzór na <strong>${formulas[formula][0]}</strong> to:</p>
+                    `;
+                    for(var value of values){
+                        if(value == formulas[formula][1]){
+                            question.innerHTML += `<input type="radio" name="answer" id="${value}" value="${value}" correct="true">`
+                        }else{
+                            question.innerHTML += `<input type="radio" name="answer" id="${value}" value="${value}" correct="false">`
+                        }
+                        question.innerHTML += `<label for="${value}">${value}</label><br>`;
+                    }
+                    question.innerHTML += `<p id="response" style="color: blue;"></p>`;
+                    question.querySelectorAll('input[type="radio"]').forEach((item) => {
+                        item.addEventListener('click', () => {
+                            var resp = document.getElementById('response');
+                            if(item.getAttribute("correct") == "true"){
+                                resp.innerText = "DOBRZE!";
+                            }else{
+                                resp.innerText = "Źle :(";
+                            }
+                            question.querySelectorAll('input[type="radio"]').forEach((inp) => {
+                                var ans = inp.nextSibling;
+                                if(inp.getAttribute("correct") == "true"){
+                                    ans.style.backgroundColor = 'lime';
+                                }else{
+                                    ans.style.backgroundColor = 'red';
+                                }
+                            });
+                        });
+                    });
+                }else{
+                    question.innerHTML = `
+                        <p>Wpisz poprawną odpowiedź. Pamiętaj, że system jest głupi i wymaga odpowiedzi praktycznie identycznych do tych z abcd. Jeżeli potrzebujesz skopiuj znak pierwiastka √</p>
+                        <p>Wzór na <strong>${formulas[formula][0]}</strong> to:</p>
+                        <input type="text" id="user_formula">
+                        <button id="submit">Sprawdź!</button>
+                        <button id="correct">Pokaż odpowiedź!</button>
+                        <p id="response" style="color: blue;"></p>
+                    `;
+                    const checkout = () => {
+                        var resp = document.getElementById('response');
+                        if(document.getElementById('user_formula').value.trim() == formulas[formula][1].trim()){
+                            resp.innerText = "DOBRZE!";
+                        }else{
+                            resp.innerText = "Źle :(";
+                        }
+                    };
+                    document.getElementById('submit').addEventListener('click', checkout);
+                    document.getElementById('user_formula').addEventListener('keydown', (e) => {
+                        if(e.key == "Enter"){
+                            checkout();
+                        }
+                    });
+                    document.getElementById('correct').addEventListener('click', () => {
+                        document.getElementById('response').innerText = formulas[formula][1];
+                    });
+                }
+            }
+
+
+            window.addEventListener('load', () => {
+                var button = document.createElement('button');
+                button.innerText = "Następne pytanie!";
+                button.addEventListener('click', loadNew);
+
+                var prob_label = document.createElement('label');
+                prob_label.for = 'probability';
+                prob_label.innerText = 'Prawdopodobieństwo procentowe (0-100%) wylosowania abcd: ';
+                var probability = document.createElement('input');
+                probability.id = 'probability';
+                probability.type = 'number';
+                probability.min = 0;
+                probability.max = 100;
+                probability.step = 1;
+                probability.value = 60;
+
+                var question = document.createElement('div');
+                question.id = "question"
+
+                var root = document.getElementById('root');
+                root.appendChild(prob_label);
+                root.appendChild(probability);
+                root.appendChild(question);
+                root.appendChild(button);
+                loadNew();
+            });
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+</html>
